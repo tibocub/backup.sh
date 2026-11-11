@@ -45,9 +45,9 @@ echo "==> Successfully installed 'backup' to $BACKUP_BIN!"
 # 5. PATH check
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo ""
-    echo "⚠️  Warning: '$INSTALL_DIR' is not currently in your \$PATH."
+    echo "Warning: '$INSTALL_DIR' is not currently in your \$PATH."
     echo "To use 'backup' from anywhere, add this line to your ~/.bashrc or ~/.zshrc:"
     echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
 else
-    echo "✨ You're all set! Run 'backup push' or 'backup pull' from anywhere."
+    echo "You're all set! Run 'backup push' or 'backup pull' from anywhere."
 fi
