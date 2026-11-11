@@ -4,7 +4,7 @@ set -e
 
 INSTALL_DIR="$HOME/.local/bin"
 BACKUP_BIN="$INSTALL_DIR/backup"
-RAW_URL="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/backup"
+RAW_URL="https://raw.githubusercontent.com/tibocub/backup.sh/main/backup"
 
 echo "==> Setting up the backup utility..."
 
