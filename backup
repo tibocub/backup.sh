@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Configuration (automatically populated by install.sh)
+LOCAL_DIR="__LOCAL_DIR__"
+BACKUP_REPO_DIR="__BACKUP_REPO_DIR__"
+
+show_help() {
+    echo "Usage: backup [push|pull]"
+    echo "  push   - Sync local projects to backup repo and push to GitHub"
+    echo "  pull   - Pull from GitHub backup repo and sync to local projects"
+}
+
+# --- Pre-flight Checks ---
+
+if [ ! -d "$LOCAL_DIR" ]; then
+    echo "Error: Local directory '$LOCAL_DIR' does not exist." >&2
+    exit 1
+fi
+
+if [ ! -d "$BACKUP_REPO_DIR" ]; then
+    echo "Error: Backup repository directory '$BACKUP_REPO_DIR' does not exist." >&2
+    echo "Please clone your backup repository there first:"
+    echo "  git clone <your-github-repo-url> $BACKUP_REPO_DIR"
+    exit 1
+fi
+
+if [ ! -d "$BACKUP_REPO_DIR/.git" ]; then
+    echo "Error: '$BACKUP_REPO_DIR' is not a git repository." >&2
+    exit 1
+fi
+
+cd "$BACKUP_REPO_DIR" || exit 1
+if ! git remote get-url origin > /dev/null 2>&1; then
+    echo "Error: No remote 'origin' found in '$BACKUP_REPO_DIR'." >&2
+    exit 1
+fi
+
+# --- Main Logic ---
+
+case "$1" in
+    push)
+        echo "==> Preparing backup from local files $LOCAL_DIR ..."
+        
+        rsync -av --delete --exclude='.git' --exclude='node_modules/' "$LOCAL_DIR/" "$BACKUP_REPO_DIR/"
+        
+        cd "$BACKUP_REPO_DIR" || exit 1
+        git add .
+        
+        if git diff-index --quiet HEAD --; then
+            echo "No local changes to push."
+        else
+            git commit -m "Backup: $(date +'%Y-%m-%d %H:%M:%S')"
+            
+            echo "==> Pushing to GitHub..."
+            if git push origin main; then
+                echo "Successfully pushed backup to GitHub!"
+            else
+                echo "Error: Failed to push to GitHub (check your network connection or credentials)." >&2
+                exit 1
+            fi
+        fi
+        ;;
+        
+    pull)
+        echo "==> Pulling latest backup from GitHub..."
+        
+        cd "$BACKUP_REPO_DIR" || exit 1
+        
+        if git pull origin main; then
+            echo "==> Applying backup into $LOCAL_DIR ..."
+            
+            rsync -av --delete --exclude='.git' --exclude='node_modules/' "$BACKUP_REPO_DIR/" "$LOCAL_DIR/"
+            echo "Successfully pulled and applied backup!"
+        else
+            echo "Error: Failed to pull from GitHub (check your network connection)." >&2
+            exit 1
+        fi
+        ;;
+        
+    *)
+        show_help
+        exit 1
+        ;;
+esac
