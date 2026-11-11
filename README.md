@@ -13,7 +13,7 @@ between your home machine and school using a central GitHub backup repository.
 Clone or download this repository, navigate into it, and run the installer:
 
 ```bash
-sh -c "$(wget -qO- [https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/install.sh](https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/install.sh))"
+sh -c "$(wget -qO- https://raw.githubusercontent.com/tibocub/backup.sh/main/install.sh)"
 ```
 
 **Before running** `backup`, setup your backup's remote origin. 
